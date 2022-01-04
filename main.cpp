@@ -1,193 +1,374 @@
+#include "main.h"
+#include <math.h>
 #include <iostream>
-#include "Lexical_Analyze.h"
-#include "Grammar_Analyze.h"
-#include "output.h"
-#include <bits/stdc++.h>//è°ƒå…¨åº“
-#include "vector"
-#include "string"
-#include "vector"
-#include "intermediateCode.h"
-extern vector<Code>code;
+#include <algorithm>
 using namespace std;
-int main() {
-    vector <word> result;
-    freopen("error.txt","w",stdout);
-    result=Lexical_Analyze();//è¯æ³•åˆ†æ
-    Grammar_Analyze(result);
-    //output(result);//è¾“å‡º
-    /*for (auto &x : code) {
-        switch(x.instruct){
-            case def:
-                cout << "def" << endl;
-                break;
-            case palloc:
-                cout << "palloc" << endl;
-                break;
-            case rcdsize:
-                cout << "rcdsize" << endl;
-                break;
-            case assign:
-                cout << "assign" << endl;
-                break;
-            case lod:
-                cout << "lod" << endl;
-                break;
-            case mult:
-                cout << "mult" << endl;
-                break;
-            case add:
-                cout << "add" << endl;
-                break;
-            case sub:
-                cout << "sub" << endl;
-                break;
-            case divi:
-                cout << "div" << endl;
-                break;
-            case mod:
-                cout << "mod" << endl;
-                break;
-            case offset1:
-                cout << "offset1" << endl;
-                break;
-            case offset2:
-                cout << "offset2" << endl;
-                break;
-            case adress:
-                cout << "adress" << endl;
-                break;
-            case toPositive:
-                cout << "toPositive" << endl;
-                break;
-            case toMinus:
-                cout << "toMinus" << endl;
-                break;
-            case toNOT:
-                cout << "toNOT" << endl;
-                break;
-            case putNum:
-                cout << "putNum" << endl;
-                break;
-            case moveadress:
-                cout << "moveadress" << endl;
-                break;
-            case moveToend:
-                cout << "moveToend" << endl;
-                break;
-            case Main:
-                cout << "main" << endl;
-                break;
-            case Begin:
-                cout << "Begin" << endl;
-                break;
-            case End:
-                cout << "End" << endl;
-                break;
-            case Break:
-                cout << "Break" << endl;
-                break;
-            case Continue:
-                cout << "Continue" << endl;
-                break;
-            case OR:
-                cout << "OR" << endl;
-                break;
-            case AND:
-                cout << "AND" << endl;
-                break;
-            case EQL:
-                cout << "EQL" << endl;
-                break;
-            case NEQ:
-                cout << "NEQL" << endl;
-                break;
-            case LSS:
-                cout << "LSS" << endl;
-                break;
-            case LEQ:
-                cout << "LEQ" << endl;
-                break;
-            case GRE:
-                cout << "GRE" << endl;
-                break;
-            case GEQ:
-                cout << "GEQ" << endl;
-                break;
-            case clear:
-                cout << "clear" << endl;
-                break;
-            case IF:
-                cout << "IF" << endl;
-                break;
-            case ELSEIF:
-                cout << "ELSEIF" << endl;
-                break;
-            case ELSE:
-                cout << "ELSE" << endl;
-                break;
-            case formatstring:
-                cout << "formatstring" << endl;
-                break;
-            case print:
-                cout << "print" << endl;
-                break;
-            case funcBegin:
-                cout << "funcBegin" << endl;
-                break;
-            case whileMark:
-                cout << "whileMark" << endl;
-                break;
-            case endwhileMark:
-                cout << "endwhileMark" << endl;
-                break;
-            case WHILE:
-                cout << "WHILE" << endl;
-                break;
-            case storeOP:
-                cout << "storeOP" << endl;
-                break;
-            case storeID:
-                cout << "storeID" << endl;
-                break;
-            case _2to1:
-                cout << "_2to1" << endl;
-                break;
-            case put0:
-                cout << "putsize" << endl;
-                break;
-            case callFun:
-                cout << "callFun" << endl;
-                break;
-            case funcDefine:
-                cout << "funcDefine" << endl;
-                break;
-            case normalVar:
-                cout << "normalVar" << endl;
-                break;
-            case array1Var:
-                cout << "array1Var" << endl;
-                break;
-            case array2Var:
-                cout << "array2Var" << endl;
-                break;
-            case defFormalVar:
-                cout << "defFormalVar" << endl;
-                break;
-            case pop:
-                cout << "pop" << endl;
-                break;
-            case RETURN:
-                cout << "RETURN" << endl;
-                break;
-            case ReturnValue:
-                cout << "ReturnValue" << endl;
-                break;
-            case NoneReturn:
-                cout << "NoneReturn" << endl;
-                break;
-        }
-    }*/
-    //call_Code();
-    //test();
-    return 0;
+
+const int average_router = 1;
+const int average_receiver_X = 4;
+const int average_receiver_Y = 7;
+
+int main()
+{
+	int time_end = 500;
+
+	//³õÊ¼»¯
+	//´´½¨ºô½Ğµ½´ïÊ±¼ä
+	vector<vector<int>>* call_arrive_time = generate_call_arrive_time(0.5, 0.5, 5, 5);
+
+	//´´½¨ºô½ĞÊµÌå
+	vector<vector<call>>* call_XY = generate_call(*call_arrive_time);
+
+	//°ÑXYºô½ĞÊµÌåºÏ²¢£¬µÃµ½Ò»¸öÊµÌå±í£¬modeÎªºÏ²¢¹æÔò
+	vector<call> call_all = merge(&(*call_XY)[0], &(*call_XY)[1], 2); //ÕâÊ±ÒÑ¾­°´ÕÕÊ±¼äË³ĞòÅÅÁĞºÃÁË
+
+	router router[N_router];  //´´½¨Â·ÓÉÆ÷ÊµÌå
+	for (int i = 0; i < N_router; i++)
+	{
+		router[i].state = 0;
+		router[i].call_now = { 0,'Z',0 ,0 };
+	}
+
+	receiver receiver1[N_receiver_X];  //´´½¨½ÓÏßÔ±1ÊµÌå: ¸ºÔğXÀàºô½Ğ
+	for (int i = 0; i < N_receiver_X; i++)
+	{
+		receiver1[i].state = 0;
+		receiver1[i].call_now = { 0,'Z',0 ,0 };
+	}
+
+	receiver receiver2[N_receiver_Y];  //´´½¨½ÓÏßÔ±2ÊµÌå: ¸ºÔğYÀàºô½Ğ
+	for (int i = 0; i < N_receiver_Y; i++)
+	{
+		receiver2[i].state = 0;
+		receiver2[i].call_now = { 0,'Z',0 ,0 };
+	}
+
+	//¿ªÊ¼·ÂÕæ
+	int clock = 0;
+
+	//³õÊ¼»¯
+	vector<vector<call>> router_list(N_router);  //Â·ÓÉ¶ÓÁĞ
+	vector<vector<call>> receiver_X_list(N_receiver_X);  //½ÓÏßÔ±1¶ÓÁĞ
+	vector<vector<call>> receiver_Y_list(N_receiver_Y);  //½ÓÏßÔ±2¶ÓÁĞ
+
+	//Í³¼ÆÊı¾İ
+	int number_finish_X = 0;  //Íê³ÉµÄXºô½Ğ½ÓÏßÊı
+	int number_finish_Y = 0;  //Íê³ÉµÄYºô½Ğ½ÓÏßÊı
+	int sum_wait_time = 0;  //ËùÓĞºô½ĞµÈ´ıµÄ×ÜÊ±¼ä
+
+	//´´½¨BÊÂ¼şÁĞ±í
+	struct Node h; //´´½¨Á´±íµÄÍ·½áµã£¨·ÀÖ¹Ö®ºó³öÏÖNULL£©
+	h.call = { 0,'Z',0 ,0 };
+	h.next = NULL;
+	h.NType = 0;
+	h.Occurtime = 0;
+	h.receiver_num = 0;
+	h.router_num = 0;
+	head = &h;
+
+	struct Node* p;//´´½¨½ÚµãÖ¸Õë
+	p = head;
+
+	int n = call_all.size();  //Á´±í³¤¶È
+	for (int i = 0; i < n; i++)  //Ñ­»·´´½¨½áµã
+	{
+		struct Node* s = (struct Node*)malloc(sizeof(struct Node));//´´½¨s½áµã£¬²¢·ÖÅäÄÚ´æ
+		//¸øs½áµã¸³Öµ
+		s->call = call_all[i];
+		if (call_all[i].type == 'X')	s->NType = 1;   //Xºô½Ğµ½´ï²¢½øÈëÂ·ÓÉ¶ÓÁĞ
+		if (call_all[i].type == 'Y')	s->NType = 2;   //Yºô½Ğµ½´ï²¢½øÈëÂ·ÓÉ¶ÓÁĞ
+		s->Occurtime = call_all[i].time_arrive;  //µ½´ïÊ±¼ä¼´ÊÂ¼ş·¢ÉúÊ±¼ä
+		s->router_num = 0;
+		s->receiver_num = 0;
+		//Î²²å·¨½¨Á¢Á´±í
+		p->next = s;  //ÔÚÍ·½áµãºóÃæ²åÈë¸Õ¸Õ³õÊ¼»¯µÄ½áµã
+		s->next = NULL;  //ÈÃ²åÔÚÎ²²¿µÄs½áµãµÄÖ¸ÕëÖ¸ÏòNULL
+		p = s;  //p½áµã±£´æ¸Õ²ÅµÄs½áµã£¬ÒÔ±£Ö¤pÊ¼ÖÕÎªÁ´±íµÄ×îºóÒ»¸ö½Úµã
+	}
+
+	struct Node end;   //´´½¨·ÂÕæ½áÊøÊÂ¼şµÄÎ²½áµã
+	end.call = { 0,'Z',0 ,0 };
+	end.next = NULL;
+	end.NType = 6;
+	end.receiver_num = 0;
+	end.router_num = 0;
+	end.Occurtime = time_end; //·ÂÕæ½áÊø
+
+	struct Node* tmp;
+	tmp = head;
+	while (tmp != NULL)
+	{
+		if (tmp->next == NULL || tmp->next->Occurtime > end.Occurtime)
+		{
+			end.next = tmp->next;
+			tmp->next = &end;
+			break;
+		}
+		tmp = tmp->next;
+	}
+
+	cout << "-------³õÊ¼»¯-------" << endl;
+	print_state(router, receiver1, receiver2, &router_list, &receiver_X_list, &receiver_Y_list);
+	cout << endl;
+	cout << endl;
+
+
+	//¿ªÊ¼B½×¶Î
+	struct Node* s;
+	s = head->next;  //Í·½áµãºóµÚÒ»¸ö½áµã
+	while (s != NULL && s->Occurtime <= time_end)
+	{
+		clock = s->Occurtime;  //ÍÆ½øµ½×î½üÒª·¢ÉúµÄÊÂ¼şµÄÊ±¼ä
+		cout << "µ±Ç°Ê±¼ä£º  " << clock << endl;
+		//ĞÎ³ÉÕâ¸öÊ±¿ÌÒª·¢ÉúµÄBÊÂ¼şÁĞ±í£¬¼´´ÓÍ·¼ì²é¸÷¸öÊÂ¼şµÄ·¢ÉúÊ±¼ä
+		while (s != NULL && s->Occurtime == clock)
+		{
+			if (s->NType == 1 || s->NType == 2)  //B1ÊÂ¼ş£¬X¡¢Yºô½Ğµ½´ïÂ·ÓÉ
+			{
+				int k = 0; //kÎªÑ¡ÔñµÄÂ·ÓÉ
+				int min = 0;  //minÎªÕÒµ½µÄµÈ´ı¶ÓÁĞ×îĞ¡µÄÂ·ÓÉ
+				int flag = 0;
+				for (int i = 0; i < N_router; i++)
+				{
+					if (router_list[i].size() <= router_list[min].size()) //ÏÈ¿´µÈ´ı¶ÓÁĞµÄ´óĞ¡
+					{
+						min = i;
+						if (router[i].state == 0)
+						{
+							flag = 1;  //ÔÙ¿´¿´Õâ¸öµÈ´ı¶ÓÁĞÕıÔÚµÈ´ıµÄÂ·ÓÉÊÇ·ñÔÚ¹¤×÷£¬Èô¿ÕÏĞ£¬ÄÇk¾ÍÊÇËüÁË£¡
+							k = i;
+						}
+					}
+					if (flag == 0)		k = min;  //Èç¹û¶¼ÔÚÃ¦£¬¾Í»¹ÊÇÔÚÃ¦µÄ»ù´¡ÉÏÑ¡Ò»¸ö¶ÓÁĞ×îĞ¡µÄ°É£¡
+				}  //ÕÒ³ökÊÇ¶ÓÁĞÊı×îĞ¡µÄ£¬ÈôÓĞÏàÍ¬µÄ£¬È¡¿¿ºóµÄÂ·ÓÉ
+				router_list[k].push_back(s->call);
+			}
+			if (s->NType == 3)  //B3ÊÂ¼ş£¬Â·ÓÉÍê³É¹¤×÷²¢Êä³öXµ½½ÓÏßÔ±1¶ÓÁĞ£¬Yµ½½ÓÏßÔ±2¶ÓÁĞ
+			{
+				router[s->router_num].state = 0;
+				if (s->call.type == 'X')
+				{
+					int k = 0; //kÎªÑ¡ÔñµÄ½ÓÏßÔ±1
+					int min = 0;  //minÎªÕÒµ½µÄµÈ´ı¶ÓÁĞ×îĞ¡µÄ½ÓÏßÔ±1
+					int flag = 0;
+					for (int i = 0; i < N_receiver_X; i++)
+					{
+						if (receiver_X_list[i].size() <= receiver_X_list[min].size())   //ÏÈ¿´µÈ´ı¶ÓÁĞµÄ´óĞ¡
+						{
+							min = i;
+							if (receiver1[i].state == 0)
+							{
+								flag = 1;  //ÔÙ¿´¿´Õâ¸öµÈ´ı¶ÓÁĞÕıÔÚµÈ´ıµÄÂ·ÓÉÊÇ·ñÔÚ¹¤×÷£¬Èô¿ÕÏĞ£¬ÄÇk¾ÍÊÇËüÁË£¡
+								k = i;
+							}
+						}
+						if (flag == 0)		k = min;  //Èç¹û¶¼ÔÚÃ¦£¬¾Í»¹ÊÇÔÚÃ¦µÄ»ù´¡ÉÏÑ¡Ò»¸ö¶ÓÁĞ×îĞ¡µÄ°É£¡
+
+					}  //ÕÒ³ökÊÇ¶ÓÁĞÊı×îĞ¡µÄ£¬ÈôÓĞÏàÍ¬µÄ£¬È¡¿¿ºóµÄÂ·ÓÉ
+					receiver_X_list[k].push_back(s->call);
+				}
+				if (s->call.type == 'Y')
+				{
+					int k = 0; //kÎªÑ¡ÔñµÄ½ÓÏßÔ±2
+					int min = 0;  //minÎªÕÒµ½µÄµÈ´ı¶ÓÁĞ×îĞ¡µÄ½ÓÏßÔ±2
+					int flag = 0;
+					for (int i = 0; i < N_receiver_Y; i++)
+					{
+						if (receiver_Y_list[i].size() <= receiver_Y_list[min].size())
+						{
+							min = i;
+							if (receiver2[i].state == 0)
+							{
+								flag = 1;  //ÔÙ¿´¿´Õâ¸öµÈ´ı¶ÓÁĞÕıÔÚµÈ´ıµÄÂ·ÓÉÊÇ·ñÔÚ¹¤×÷£¬Èô¿ÕÏĞ£¬ÄÇk¾ÍÊÇËüÁË£¡
+								k = i;
+							}
+						}
+						if (flag == 0)		k = min;  //Èç¹û¶¼ÔÚÃ¦£¬¾Í»¹ÊÇÔÚÃ¦µÄ»ù´¡ÉÏÑ¡Ò»¸ö¶ÓÁĞ×îĞ¡µÄ°É£¡
+					}  //ÕÒ³ökÊÇ¶ÓÁĞÊı×îĞ¡µÄ£¬ÈôÓĞÏàÍ¬µÄ£¬È¡¿¿ºóµÄÂ·ÓÉ
+					receiver_Y_list[k].push_back(s->call);
+				}
+			}
+			if (s->NType == 4)  //B4ÊÂ¼ş,½ÓÏßÔ±1Íê³É¹¤×÷£¨Íê³É½ÓÏßÊı¼Ó1£©
+			{
+				receiver1[s->receiver_num].state = 0;
+				number_finish_X++;
+			}
+			if (s->NType == 5)  //B5ÊÂ¼ş,½ÓÏßÔ±2Íê³É¹¤×÷£¨Íê³É½ÓÏßÊı¼Ó1£©
+			{
+				receiver2[s->receiver_num].state = 0;
+				number_finish_Y++;
+			}
+			if (s->NType == 6)  //B6ÊÂ¼ş£¬·ÂÕæ½áÊø
+			{
+				cout << "-------·ÂÕæ½áÊø-------" << endl;
+				if (number_finish_X + number_finish_Y == 0)
+					cout << "Æ½¾ùÃ¿¸öºô½ĞµÈ´ıÊ±¼äÎª£º" << "Î´Íê³É" << endl;
+				else
+				{
+					double average_wait_time = (double)sum_wait_time / ((double)number_finish_X + (double)number_finish_Y);
+					cout << "Æ½¾ùÃ¿¸öºô½ĞµÈ´ıÊ±¼äÎª£º" << average_wait_time << endl;
+				}
+				exit(1);
+			}
+
+			//¸Ä±ä×´Ì¬ºó¾ÍÉ¾³ıÕâ¸ö½áµã£¬Ê¹sÖ¸ÏòĞÂµÄÍ·½áµã
+			head->next = s->next;
+			free(s);
+			s = head->next;
+		}
+		cout << "-------B½×¶Î-------" << endl;
+		print_state(router, receiver1, receiver2, &router_list, &receiver_X_list, &receiver_Y_list);
+		//¿ªÊ¼Ö´ĞĞCÊÂ¼ş
+
+		//Ã¿¸öÂ·ÓÉ°Ñµç»°´ÓÂ·ÓÉ¶ÓÁĞÖĞÈ¡³ö²¢¿ªÊ¼¹¤×÷¡ª¡ªC1
+		for (int t = 0; t < N_router; t++)
+		{
+			if (!router_list[t].empty())
+			{
+				int work_time = generate_work_time(average_router, 1);
+				int nr = router_list[t].size();
+				for (int i = 0; i < nr; i++)
+				{
+					if (router[t].state == 0)  //Èç¹ûÂ·ÓÉ¿ÕÏĞ
+					{
+						router[t].call_now = router_list[t][i];  //°Ñ¸Ãºô½Ğ½»¸øÂ·ÓÉ´¦Àí
+						//ĞŞ¸Äºô½Ğ¡¢Â·ÓÉµÄ²ÎÊı
+						router_list[t][i].state = 1;
+						router[t].state = 1;
+
+						//²úÉúÏÂÒ»¸öBÊÂ¼ş¡ª¡ªB3
+						struct Node* in = (struct Node*)malloc(sizeof(struct Node));
+						in->NType = 3;
+						in->call = router_list[t][i];
+						in->Occurtime = clock + work_time;
+						in->router_num = t;
+						in->next = NULL;
+
+						//¸ù¾İÒª²åÈëµÄ½áµãµÄoccurtime°Ñ¸Ã½áµã²åÈëÁ´±íµÄºÏÊÊÎ»ÖÃ
+						struct Node* tmp = (struct Node*)malloc(sizeof(struct Node));//´´½¨tmp½áµã£¬²¢·ÖÅäÄÚ´æ
+						tmp = head; // Ö¸ÏòÖ¸Õë
+						while (tmp != NULL)
+						{
+							if (tmp->next == NULL || tmp->next->Occurtime > in->Occurtime)
+							{
+								in->next = tmp->next;
+								tmp->next = in;
+								break;
+							}
+							tmp = tmp->next;
+						}
+						router_list[t].erase(router_list[t].begin());  //Èç¹ûÒÑ¾­´¦Àí¹ıÁË£¬¾Í°ÑÕâ¸öºô½Ğ´ÓÂ·ÓÉµÈ´ı¶ÓÁĞÖĞÉ¾³ı
+					}
+					else //Èç¹ûÂ·ÓÉÃ¦ÂµÖĞ,Î´³É¹¦´¦Àí£¬ÔòÕâ¸öcall»¹Òª¼ÌĞøÔÚµÈ´ı¶ÓÁĞÖĞ
+					{
+						sum_wait_time = sum_wait_time + work_time;
+					}
+				}
+			}
+		}
+
+
+		//½ÓÏßÔ±1°Ñµç»°´Ó½ÓÏßÔ±1µÄ¶ÓÁĞÖĞÈ¡³ö²¢¿ªÊ¼¹¤×÷¡ª¡ªC2
+		for (int t = 0; t < N_receiver_X; t++)
+		{
+			if (!receiver_X_list[t].empty())
+			{
+				int work_time = generate_work_time(average_receiver_X, 1);
+				int nx = receiver_X_list[t].size();
+				for (int i = 0; i < nx; i++)
+				{
+					if (receiver1[t].state == 0)  //Èç¹û½ÓÏßÔ±¿ÕÏĞ
+					{
+						receiver1[t].call_now = receiver_X_list[t][i];  //°Ñ¸Ãºô½Ğ½»¸ø½ÓÏßÔ±´¦Àí
+						//ĞŞ¸Ä½ÓÏßÔ±µÄ²ÎÊı
+						receiver_X_list[t][i].state = 1;
+						receiver1[t].state = 1;
+
+						//²úÉúÏÂÒ»¸öBÊÂ¼ş¡ª¡ªB4
+						struct Node* in = (struct Node*)malloc(sizeof(struct Node));
+						in->NType = 4;
+						in->call = receiver_X_list[t][i];
+						in->Occurtime = clock + work_time;
+						in->receiver_num = t;
+						in->next = NULL;
+						//¸ù¾İÒª²åÈëµÄ½áµãµÄoccurtime°Ñ¸Ã½áµã²åÈëÁ´±íµÄºÏÊÊÎ»ÖÃ
+						struct Node* tmp = (struct Node*)malloc(sizeof(struct Node));
+						tmp = head;
+						while (tmp != NULL)
+						{
+							if (tmp->next == NULL || tmp->next->Occurtime > in->Occurtime)
+							{
+								in->next = tmp->next;
+								tmp->next = in;
+								break;
+							}
+							tmp = tmp->next;
+						}
+						receiver_X_list[t].erase(receiver_X_list[t].begin());  //Èç¹ûÒÑ¾­´¦Àí¹ıÁË£¬¾Í°ÑÕâ¸öºô½Ğ´Ó½ÓÏßÔ±1µÈ´ı¶ÓÁĞÖĞÉ¾³ı
+					}
+					else //Èç¹û½ÓÏßÔ±Ã¦ÂµÖĞ,Î´³É¹¦´¦Àí£¬ÔòÕâ¸öµÈ´ı¶ÓÁĞ»¹Òª¼ÌĞøÔÚµÈ´ı¶ÓÁĞÖĞ
+					{
+						sum_wait_time = sum_wait_time + work_time;
+					}
+				}
+			}
+		}
+
+		//½ÓÏßÔ±2°Ñµç»°´Ó½ÓÏßÔ±2µÄ¶ÓÁĞÖĞÈ¡³ö²¢¿ªÊ¼¹¤×÷¡ª¡ªC3
+		for (int t = 0; t < N_receiver_Y; t++)
+		{
+			if (!receiver_Y_list[t].empty())
+			{
+				int work_time = generate_work_time(average_receiver_Y, 1);
+				int ny = receiver_Y_list[t].size();
+				for (int i = 0; i < ny; i++)
+				{
+					if (receiver2[t].state == 0)  //Èç¹û½ÓÏßÔ±2¿ÕÏĞ
+					{
+						receiver2[t].call_now = receiver_Y_list[t][i];  //°Ñ¸Ãºô½Ğ½»¸ø½ÓÏßÔ±2´¦Àí
+						//ĞŞ¸Äºô½Ğ¡¢½ÓÏßÔ±2µÄ²ÎÊı
+						receiver_Y_list[t][i].state = 1;
+						receiver2[t].state = 1;
+
+						//²úÉúÏÂÒ»¸öBÊÂ¼ş¡ª¡ªB5
+						struct Node* in = (struct Node*)malloc(sizeof(struct Node));
+						in->NType = 5;
+						in->call = receiver_Y_list[t][i];
+						in->Occurtime = clock + work_time;
+						in->receiver_num = t;
+						in->next = NULL;
+						//¸ù¾İÒª²åÈëµÄ½áµãµÄoccurtime°Ñ¸Ã½áµã²åÈëÁ´±íµÄºÏÊÊÎ»ÖÃ
+						struct Node* tmp = (struct Node*)malloc(sizeof(struct Node));
+						tmp = head;
+						while (tmp != NULL)
+						{
+							if (tmp->next == NULL || tmp->next->Occurtime > in->Occurtime)
+							{
+								in->next = tmp->next;
+								tmp->next = in;
+								break;
+							}
+							tmp = tmp->next;
+						}
+						receiver_Y_list[t].erase(receiver_Y_list[t].begin());  //Èç¹ûÒÑ¾­´¦Àí¹ıÁË£¬¾Í°ÑÕâ¸öºô½Ğ´Ó½ÓÏßÔ±2µÈ´ı¶ÓÁĞÖĞÉ¾³ı
+					}
+					else //Èç¹ûÂ·ÓÉÃ¦ÂµÖĞ,Î´³É¹¦´¦Àí£¬ÔòÕâ¸öcall»¹Òª¼ÌĞøÔÚµÈ´ı¶ÓÁĞÖĞ
+					{
+						sum_wait_time = sum_wait_time + work_time;
+					}
+				}
+			}
+		}
+		cout << "-------C½×¶Î-------" << endl;
+		print_state(router, receiver1, receiver2, &router_list, &receiver_X_list, &receiver_Y_list);
+
+		cout << "µ±Ç°ÒÑÍê³ÉXºô½Ğ¸öÊı£º" << number_finish_X << endl;
+		cout << "µ±Ç°ÒÑÍê³ÉYºô½Ğ¸öÊı£º" << number_finish_Y << endl;
+		cout << "µ±Ç°×ÜµÈ´ıÊ±¼ä£º" << sum_wait_time << endl;
+		cout << endl;
+		cout << endl;
+
+		s = head->next;
+	}
 }
+
